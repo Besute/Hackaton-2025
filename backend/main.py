@@ -85,11 +85,20 @@ def add_vertex(vertex_array: ArrayVertex, authorization: Annotated[str, Header()
         return {"success": False, "error": "User not found"}
 
     for vertex in vertex_array.vertexes:
-        db.add_user_vertex(user_id, vertex.address, vertex.client_type, vertex.lt, vertex.lg)
+        db.add_user_vertex(user_id, vertex)
+    return {"success": True}
+
+@app.delete("/delete_vertex")
+def delete_vertex(vertex: Vertex, authorization: Annotated[str, Header()]):
+    user_id = db.get_user_id(authorization)
+    if user_id is None:
+        return {"success": False, "error": "User not found"}
+
+    db.delete_user_vertex(user_id, vertex)
     return {"success": True}
 
 
 if __name__ == "__main__":
-    # db.drop_database()
-    # db.create_database()
+    db.drop_database()
+    db.create_database()
     uvicorn.run(app, host="127.0.0.1", port=8000)

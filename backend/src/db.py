@@ -1,6 +1,8 @@
 import sqlite3
 from secrets import token_hex
 
+from src.models import Vertex
+
 class DB_Defaults:
     path = "db/users.db"
 
@@ -42,7 +44,11 @@ def create_database():
                 address TEXT NOT NULL,
                 client_type TEXT,
                 lt REAL,
-                lg REAL
+                lg REAL,
+                open_time INTEGER,
+                close_time INTEGER,
+                lunch_start INTEGER,
+                lunch_end INTEGER
             )
         ''')
 
@@ -137,12 +143,12 @@ def get_user_id(token):
         return user_id[0]
 
 
-def add_user_vertex(user_id, address, client_type, lt, lg):
+def add_user_vertex(user_id, vertex: Vertex):
     with sqlite3.connect(DB_Defaults.path) as conn:
         cursor = conn.cursor()
 
-        cursor.execute(f"INSERT INTO vertexes (user_id, address, client_type, lt, lg) VALUES (?, ?, ?, ?, ?)",
-            (user_id, address, client_type, lt, lg)
+        cursor.execute(f"INSERT INTO vertexes (user_id, address, client_type, lt, lg, open_time, close_time, lunch_start, lunch_end) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (user_id, vertex.address, vertex.client_type, vertex.lt, vertex.lg, vertex.open_time, vertex.close_time, vertex.lunch_start, vertex.lunch_end)
         )
 
         conn.commit()
@@ -162,20 +168,23 @@ def get_user_vertexes(token):
         vertexes = []
 
         for row in cursor.fetchall():
-            vertexes.append({
-                "address": row[2],
-                "client_type": row[3],
-                "lt": row[4],
-                "lg": row[5]
-            })
+            vertex_dict = dict(zip(Vertex.model_fields.keys(), row[2:]))
+            vertexes.append(vertex_dict)
 
         return vertexes
+
+
+def delete_user_vertex(user_id, vertex: Vertex):
+    with sqlite3.connect(DB_Defaults.path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""DELETE FROM vertexes WHERE user_id == ? AND address == ? AND client_type == ? AND lt == ? AND lg == ?""",
+                       (user_id, vertex.address, vertex.client_type, vertex.lt, vertex.lg)
+        )
+
+        conn.commit()
 
 
 if __name__ == "__main__":
     drop_database()
     create_database()
-
-    # token = add_user("test", "test")
-
-    print(get_user_token("test", "test"))
