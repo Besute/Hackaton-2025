@@ -78,7 +78,6 @@ const MainPage = function() {
                         vertex={vertex}
                         className='hover:bg-gray-100'
                         onDelete={() => {}}
-                        onEdit={() => {}}
                         />
                     ))}     
                 </div>

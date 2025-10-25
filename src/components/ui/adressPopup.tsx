@@ -46,14 +46,10 @@ const loadYandexMaps = (): Promise<void> => {
     document.head.appendChild(script);
   });
 };
-
-// Исправленная функция геокодирования
 const geocodeAddress = async (address: string): Promise<[number, number]> => {
-  // Убеждаемся, что Яндекс Карты загружены
   if (!window.ymaps) {
     await loadYandexMaps();
   }
-
   return new Promise((resolve, reject) => {
     window.ymaps.geocode(address, { results: 1 })
       .then((result: any) => {
@@ -81,7 +77,6 @@ const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
   const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
   const [isYmapsLoaded, setIsYmapsLoaded] = useState(false);
 
-  // Предзагрузка Яндекс Карт при открытии попапа
   useEffect(() => {
     if (isOpen && !isYmapsLoaded) {
       loadYandexMaps()
@@ -107,7 +102,6 @@ const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
     if (coords) {
       setCoordinates(coords);
     } else {
-      // Если координаты не предоставлены, геокодируем адрес
       try {
         const [lat, lon] = await geocodeAddress(address);
         setCoordinates({ lat, lon });
@@ -120,15 +114,12 @@ const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Если есть адрес но нет координат, пытаемся геокодировать
     if (formData.address && !coordinates) {
       try {
         const [lat, lon] = await geocodeAddress(formData.address);
         setCoordinates({ lat, lon });
       } catch (error) {
         console.error('Не удалось геокодировать адрес:', error);
-        // Можно показать ошибку пользователю
         alert('Не удалось определить координаты адреса. Проверьте правильность адреса.');
         return;
       }
