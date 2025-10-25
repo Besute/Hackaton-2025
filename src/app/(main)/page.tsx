@@ -17,17 +17,22 @@ const MainPage = function() {
     const [vertexes, setVertexes] = useState<Vertex[]>([]);
     useLayoutEffect(() => {
         async function getCurrentVertexes() {
-            const currentVerts = await fetch(baseURL + "/get_vertexes", {
+            const currentVerts = (await fetch(baseURL + "/get_vertexes", {
                 method: "GET",
                 headers: {
                     "Content-Type" : "application/json",
                     "Authorization" : `${token}`
                 }
-            })
+            }))
+            const data = await currentVerts.json();
+            console.log(data.vertexes)
+            setVertexes(data.vertexes || [])
         }
+        getCurrentVertexes();
     }, [loading])
-    const addVertex = async (address: string, lunch: string, timeOfWork: string, clientType: string) => {
+    const addVertex = async (address: string, lunch: string, timeOfWork: string, clientType: string, lat: undefined | number, lon: number | undefined) => {
         setLoading(true);
+        console.log(lon, lat)
         await fetch(baseURL + "/add_vertex", {
             method: "POST",
             headers: {
@@ -39,6 +44,8 @@ const MainPage = function() {
                 client_type: clientType,
                 working_hours: timeOfWork,
                 lunch_hours: lunch,
+                lt: (lat === undefined ? null : lat),
+                lg: (lon === undefined ? null : lon),
             })
         })
         setLoading(false);
@@ -70,6 +77,8 @@ const MainPage = function() {
                         key={index}
                         vertex={vertex}
                         className='hover:bg-gray-100'
+                        onDelete={() => {}}
+                        onEdit={() => {}}
                         />
                     ))}     
                 </div>
@@ -80,8 +89,8 @@ const MainPage = function() {
                 <AdressPopup 
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    onSubmit={(address: string, lunch: string, work: string, type: string) => {
-                        addVertex(address, lunch, work, type)
+                    onSubmit={(address: string, lunch: string, work: string, type: string, lat: number | undefined, lon: number | undefined) => {
+                        addVertex(address, lunch, work, type, lat, lon)
                     }}
             />
             </div>

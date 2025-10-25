@@ -18,11 +18,13 @@ async function makeRegister(url: string, login: string, password: string) {
             },
             body: dataH,
         });
-        console.log(res)
         if (!res.ok) {
             return ""
         }
         const data = await res.json();
+        if (data.success === false) {
+            return "";
+        }
         return data as string;
     } catch (error) {
         console.error('Error:', error);
@@ -47,9 +49,7 @@ const Register = function() {
                 if (email !== null && password !== null) {
                     const res = await makeRegister(baseURL + "/register", email.value, password.value)
                     if (res !== "") {
-                        setOK(true);
-                        setToken(res);
-                        router.push("/")
+                        router.push("/login")
                     } else {
                         setOK(false);
                     }

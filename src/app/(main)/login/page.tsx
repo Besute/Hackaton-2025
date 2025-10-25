@@ -23,7 +23,7 @@ async function makeEnter(url: string, login: string, password: string) {
             return ""
         }
         const data = await res.json();
-        return data as string;
+        return data.token as string;
     } catch (error) {
         console.error('Error:', error);
         return ""
@@ -39,8 +39,8 @@ const Login = function() {
         <div className="flex flex-col w-[75%] h-[70%]">
             <h1 className="text-[3rem] text-center">Вход</h1>
             <div className="flex flex-col justify-evenly h-[50%] w-[50%] m-auto">
-                <InputComponent placeholder={"Введите вашу почту"} type={"email"} className="bg-gray-400 w-full hover:bg-gray-300" />
-                <InputComponent placeholder={"Введите ваш пароль"} type={"password"} className="w-full bg-gray-400 hover:bg-gray-300" />
+                <InputComponent placeholder={"Введите вашу почту"} type={"email"} className="inputEmail bg-gray-400 w-full hover:bg-gray-300" />
+                <InputComponent placeholder={"Введите ваш пароль"} type={"password"} className="inputPassword w-full bg-gray-400 hover:bg-gray-300" />
                 <label className="flex items-center space-x-3 cursor-pointer">
                     <input 
                         type="checkbox"
@@ -53,6 +53,7 @@ const Login = function() {
                 const email = document.querySelector(".inputEmail") as HTMLInputElement;
                 const password = document.querySelector(".inputPassword") as HTMLInputElement;
                 const rememberMe = document.querySelector(".rememberMe") as HTMLInputElement;
+                console.log(email, password, "CLCI")
                 if (email !== null && password !== null) {
                     const res = await makeEnter(baseURL + "/login", email.value, password.value)
                     if (rememberMe !== null && rememberMe.value === "true") {

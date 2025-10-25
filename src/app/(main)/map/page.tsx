@@ -1,31 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import YandexMapRoute from '@/src/components/ui/mapOnPage';
 import { Vertex } from '@/src/types/vertex';
+import { AccessContext } from '@/src/components/context/access';
 
 const MapPage = () => {
+
+  const {baseURL, token} = useContext(AccessContext)
   const [points, setPoints] = useState<Vertex[]>([]);
     
   useEffect(() => {
-    const predefinedPoints: Vertex[] = [
-      {
-        address: 'ул. Тверская, 1, Москва',
-        clientType: 'vip',
-        lt: 55.7604,
-        lg: 37.6184,
-        timeOfWork: "8:00 - 16:00"
-      },
-      {
-        address: 'Красная площадь, Москва',
-        clientType: 'standard', 
-        lt: 55.756315,
-        lg: 37.614716,
-        timeOfWork: "8:00 - 16:00"
-      },
-    ];
-
-    setPoints(predefinedPoints);
+    async function getCurrentVertexes() {
+            const currentVerts = (await fetch(baseURL + "/get_vertexes", {
+                method: "GET",
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `${token}`
+                }
+            }))
+            const data = await currentVerts.json();
+            console.log(data)
+            setPoints(data.vertexes || [])
+        }
+        getCurrentVertexes();
   }, []);
 
   return (

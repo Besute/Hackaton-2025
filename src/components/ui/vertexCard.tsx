@@ -24,8 +24,8 @@ const VertexCard = function({ vertex, onEdit, onDelete, className = '' }: Vertex
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Широта: {vertex.lt.toFixed(6)}</span>
-            <span>Долгота: {vertex.lg.toFixed(6)}</span>
+            <span>Широта: {vertex.lt !== undefined ? vertex.lt.toFixed(6) : null}</span>
+            <span>Долгота: {vertex.lg !== undefined ? vertex.lg.toFixed(6) : null}</span>
           </div>
           <div className="flex items-center space-x-4 text-[1.5rem] text-gray-600">
             <svg className="w-[1.5rem] h-[1.5rem]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

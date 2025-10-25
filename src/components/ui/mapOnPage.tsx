@@ -246,7 +246,6 @@ const YandexMapRoute: React.FC<YandexMapRouteProps> = ({
   };
 
   const initializeMap = async () => {
-    // Защита от повторной инициализации
     if (isInitializedRef.current || !mapRef.current) {
       return;
     }
@@ -256,8 +255,6 @@ const YandexMapRoute: React.FC<YandexMapRouteProps> = ({
 
       const location = await getCurrentLocation();
       setCurrentLocation(location);
-
-      // Очищаем контейнер карты перед созданием новой
       if (mapRef.current) {
         mapRef.current.innerHTML = '';
       }
@@ -302,7 +299,6 @@ const YandexMapRoute: React.FC<YandexMapRouteProps> = ({
   };
 
   const loadYandexMaps = () => {
-    // Если скрипт уже загружается или загружен, не загружаем повторно
     if (window.ymaps) {
       initializeMap();
       return;
@@ -332,7 +328,6 @@ const YandexMapRoute: React.FC<YandexMapRouteProps> = ({
 
     return () => {
       stopWatchingPosition();
-      // Очищаем карту только если компонент полностью размонтируется
       if (mapInstanceRef.current && mapRef.current) {
         try {
           mapInstanceRef.current.destroy();
