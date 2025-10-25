@@ -1,0 +1,19 @@
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
+@import "tailwindcss";
+
+:root {
+  --red: red;
+}
+
+@theme {
+  --color-red: var(--red)
+}
+
+
+html {
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  font-size: 62.5%;
+}
