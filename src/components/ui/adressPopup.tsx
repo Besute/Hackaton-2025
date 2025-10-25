@@ -1,29 +1,28 @@
 "use cleint"
 
-import { useCallback, useState } from "react";
-import {
-  YMapSearchControl,
-  YMapDefaultMarker
-} from '@yandex/ymaps3-default-ui-theme';
+import { useState } from "react";
 import AddressInputWithSuggestions from "./inputFieldWithSuggestions";
 
 interface AdressPopupProps {
   isOpen: boolean;
   onClose: () => void;
+  onSubmit: (address: string, lunch: string, work: string) => void;
 }
 
-const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
+const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
         const [formData, setFormData] = useState({
         address: '',
         workHours: '',
-        lunchBreak: ''
+        lunchBreak: '',
+        type: 'Стандарт',
     });
     const [coordinates, setCoordinates] = useState<{ lat: number; lon: number } | null>(null);
         const handleClose = () => {
         setFormData({
         address: '',
         workHours: '',
-        lunchBreak: ''
+        lunchBreak: '',
+        type: ''
         });
         onClose();
     };
@@ -31,22 +30,19 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
     const handleAddressSelect = (address: string, coords?: { lat: number; lon: number }) => {
         setFormData(prev => ({ ...prev, address }));
         setCoordinates(coords || null);
-        
-        if (coords) {
-        console.log('Координаты выбранного адреса:', coords);
-        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Данные формы:', formData);
-        // Обработка данных формы
+        onSubmit(formData.address, formData.lunchBreak, formData.workHours);
+        onClose();
     };
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
-        ...prev,
-        [name]: value
+            ...prev,
+            [name]: value
         }));
     };
     if (isOpen) {
@@ -65,9 +61,8 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Адрес с иконкой */}
                 <div className="space-y-2">
-                    <label htmlFor="address" className="block text-sm font-medium text-gray-700 flex items-center">
+                    <label htmlFor="address" className="text-sm font-medium text-gray-700 flex items-center">
                     <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     </svg>
@@ -75,10 +70,8 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
                     </label>
                     <AddressInputWithSuggestions onAddressSelect={handleAddressSelect}/>
                 </div>
-
-                {/* Время работы с иконкой */}
                 <div className="space-y-2">
-                    <label htmlFor="workHours" className="block text-sm font-medium text-gray-700 flex items-center">
+                    <label htmlFor="workHours" className="text-sm font-medium text-gray-700 flex items-center">
                     <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -95,10 +88,8 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
                     required
                     />
                 </div>
-
-                {/* Время обеда с иконкой */}
                 <div className="space-y-2">
-                    <label htmlFor="lunchBreak" className="block text-sm font-medium text-gray-700 flex items-center">
+                    <label htmlFor="lunchBreak" className="text-sm font-medium text-gray-700 flex items-center">
                     <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -114,8 +105,21 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
                     className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
-
-                {/* Кнопки */}
+                <div className="space-y-2">
+                    <label htmlFor="typeClient" className="text-sm font-medium text-gray-700 flex items-center">
+                        Тип клиента
+                    </label>
+                    <select
+                        id="type"
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                        <option value="Стандарт">Стандарт</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                </div>
                 <div className="flex space-x-4 pt-4">
                     <button
                     type="button"
@@ -126,10 +130,10 @@ const AdressPopup = function({isOpen, onClose} : AdressPopupProps) {
                     </button>
                     <button
                     type="submit"
-                    onClick={handleClose}
+                    onClick={handleSubmit}
                     className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-medium transition-colors"
                     >
-                    Сохранить
+                        Сохранить
                     </button>
                 </div>
                 </form>
