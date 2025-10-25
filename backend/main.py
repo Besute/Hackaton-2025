@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
 from src import db
-from src.models import UserRegistration, AuthorizationHeader, ArrayVertex, Vertex
+from src.models import *
 
 
 app = FastAPI()
@@ -45,6 +45,7 @@ def create_database():
     db.create_database()
     return {"message": "Database created successfully"}
 
+
 @app.get("/get_user_id")
 def get_user_id(token: str):
     user_id = db.get_user_id(token)
@@ -58,6 +59,7 @@ def register_user(user: UserRegistration):
     if token is None:
         return {"error": "User already exists"}
     return {"token": token}
+
 
 @app.post("/login")
 def login_user(user: UserRegistration):
@@ -78,23 +80,41 @@ def get_vertexes(authorization: Annotated[str, Header()]):
         return {"success": False, "error": "User not found"}
     return {"vertexes": vertexes}
 
+
 @app.post("/add_vertexes")
-def add_vertex(vertex_array: ArrayVertex, authorization: Annotated[str, Header()]):
+def add_vertexes(vertex_input_array: ArrayVertexInput, authorization: Annotated[str, Header()]):
     user_id = db.get_user_id(authorization)
     if user_id is None:
         return {"success": False, "error": "User not found"}
 
-    for vertex in vertex_array.vertexes:
-        db.add_user_vertex(user_id, vertex)
+    try:
+        for vertex_input in vertex_input_array.vertexes:
+            db.add_user_vertex(user_id, vertex_from_input(vertex_input))
+    except Exception as e:
+        return {"success": False, "error": str(e), "vertex": vertex_input}
     return {"success": True}
 
-@app.delete("/delete_vertex")
-def delete_vertex(vertex: Vertex, authorization: Annotated[str, Header()]):
+
+@app.post("/add_vertex")
+def add_vertex(vertex_input: VertexInput, authorization: Annotated[str, Header()]):
     user_id = db.get_user_id(authorization)
     if user_id is None:
         return {"success": False, "error": "User not found"}
 
-    db.delete_user_vertex(user_id, vertex)
+    try:
+        db.add_user_vertex(user_id, vertex_from_input(vertex_input))
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    return {"success": True}
+
+
+@app.delete("/delete_vertex")
+def delete_vertex(address: str, authorization: Annotated[str, Header()]):
+    user_id = db.get_user_id(authorization)
+    if user_id is None:
+        return {"success": False, "error": "User not found"}
+
+    db.delete_user_vertex(user_id, address)
     return {"success": True}
 
 

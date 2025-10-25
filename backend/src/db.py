@@ -45,10 +45,10 @@ def create_database():
                 client_type TEXT,
                 lt REAL,
                 lg REAL,
-                open_time INTEGER,
-                close_time INTEGER,
-                lunch_start INTEGER,
-                lunch_end INTEGER
+                open_time REAL,
+                close_time REAL,
+                lunch_start REAL,
+                lunch_end REAL
             )
         ''')
 
@@ -174,12 +174,12 @@ def get_user_vertexes(token):
         return vertexes
 
 
-def delete_user_vertex(user_id, vertex: Vertex):
+def delete_user_vertex(user_id, address: str):
     with sqlite3.connect(DB_Defaults.path) as conn:
         cursor = conn.cursor()
 
-        cursor.execute("""DELETE FROM vertexes WHERE user_id == ? AND address == ? AND client_type == ? AND lt == ? AND lg == ?""",
-                       (user_id, vertex.address, vertex.client_type, vertex.lt, vertex.lg)
+        cursor.execute("""DELETE FROM vertexes WHERE user_id == ? AND address == ?""",
+                       (user_id, address)
         )
 
         conn.commit()
