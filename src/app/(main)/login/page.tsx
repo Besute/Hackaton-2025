@@ -52,7 +52,6 @@ const Login = function() {
                 const email = document.querySelector(".inputEmail") as HTMLInputElement;
                 const password = document.querySelector(".inputPassword") as HTMLInputElement;
                 const rememberMe = document.querySelector(".rememberMe") as HTMLInputElement;
-                console.log(email, password, "CLCI")
                 if (email !== null && password !== null) {
                     const res = await makeEnter(baseURL + "/login", email.value, password.value)
                     if (rememberMe !== null && rememberMe.value === "true") {

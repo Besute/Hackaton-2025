@@ -1,9 +1,23 @@
 import { Vertex } from '@/src/types/vertex';
 
 interface VertexCardProps {
-  vertex: Vertex;
-  onEdit?: (vertex: Vertex) => void;
-  onDelete?: (vertex: Vertex) => void;
+  vertex: {
+    address: string,
+    client_type: string,
+    lg: number,
+    lt: number,
+    lunch_hours: string,
+    working_hours: string
+  };
+  onEdit?: (vertex: {
+    address: string,
+    client_type: string,
+    lg: number,
+    lt: number,
+    lunch_hours: string,
+    working_hours: string
+  }) => void;
+  onDelete?: (address:string) => void;
   className?: string;
 }
 
@@ -24,24 +38,24 @@ const VertexCard = function({ vertex, onEdit, onDelete, className = '' }: Vertex
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Широта: {vertex.lt !== null ? vertex.lt.toFixed(6) : null}</span>
-            <span>Долгота: {vertex.lg !== null ? vertex.lg.toFixed(6) : null}</span>
+            <span>Широта: {vertex.lt !== null ? vertex.lt : null}</span>
+            <span>Долгота: {vertex.lg !== null ? vertex.lg : null}</span>
           </div>
           <div className="flex items-center space-x-4 text-[1.5rem] text-gray-600">
             <svg className="w-[1.5rem] h-[1.5rem]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-            <span>Время работы: {vertex.timeOfWork}</span>
+            <span>Время работы: {vertex.working_hours}</span>
           </div>
         </div>
         <span className={`
               text-center p-[2rem] text-[2rem] font-medium rounded-full
-              ${vertex.clientType === 'vip' 
+              ${vertex.client_type === 'vip' 
                 ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                 : 'bg-blue-100 text-blue-800 border border-blue-200'
               }
             `}>
-              {vertex.clientType === 'vip' ? 'VIP' : 'Стандарт'}
+              {vertex.client_type === 'vip' ? 'VIP' : 'Стандарт'}
         </span>
         {(onEdit || onDelete) && (
           <div className="flex items-center flex-col space-x-2 ml-4">
@@ -59,7 +73,7 @@ const VertexCard = function({ vertex, onEdit, onDelete, className = '' }: Vertex
             )}
             {onDelete && (
               <button
-                onClick={() => onDelete(vertex)}
+                onClick={() => onDelete(vertex.address)}
                 className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                 title="Удалить"
               >

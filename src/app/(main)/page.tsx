@@ -25,14 +25,12 @@ const MainPage = function() {
                 }
             }))
             const data = await currentVerts.json();
-            console.log(data.vertexes)
             setVertexes(data.vertexes || [])
         }
         getCurrentVertexes();
     }, [loading])
     const addVertex = async (address: string, lunch: string, timeOfWork: string, clientType: string, lat: undefined | number, lon: number | undefined) => {
         setLoading(true);
-        console.log(lon, lat)
         await fetch(baseURL + "/add_vertex", {
             method: "POST",
             headers: {
@@ -51,12 +49,18 @@ const MainPage = function() {
         setLoading(false);
     };
 
-    async function handleDelete() {
-        return;
-    }
-
-    async function handleEdit() {
-        return;
+    async function handleDelete(address: string) {
+        fetch(baseURL + "/delete_vertex", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `${token}`
+            },
+            body: JSON.stringify({
+                token,
+                address
+            })
+        })
     }
 
     useEffect(() => {}, [])
@@ -75,9 +79,9 @@ const MainPage = function() {
                     {vertexes.map((vertex, index) => (
                         <VertexCard
                         key={index}
-                        vertex={vertex}
+                        vertex={{address: vertex.address, lt: vertex.lt, lg: vertex.lg, lunch_hours: "0", working_hours: vertex.timeOfWork, client_type: vertex.clientType}}
                         className='hover:bg-gray-100'
-                        onDelete={() => {}}
+                        onDelete={(address : string) => {handleDelete(address)}}
                         />
                     ))}     
                 </div>

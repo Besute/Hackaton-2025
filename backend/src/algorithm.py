@@ -177,6 +177,9 @@ def use_algorithm(coordinates, working_times):
 
     out = [(r[:len(coordinates)], r[len(coordinates):-1], r[-1]) for r in result]
 
+    if len(out) == 0:
+        return []
+
     total_result = [r[-1] for r in result[:5]]
     while len(total_result) < 5:
         total_result.append(total_result[-1] + 1)
