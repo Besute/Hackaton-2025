@@ -30,7 +30,6 @@ async function makeEnter(url: string, login: string, password: string) {
     }
 }
 
-
 const Login = function() {
     const router = useRouter();
     const {setOK, OK, baseURL, setToken, setMemo } = useContext(AccessContext);
@@ -64,7 +63,6 @@ const Login = function() {
                         setToken(res);
                         router.push("/")
                     } else {
-                        console.log("YES")
                         setOK(false);
                     }
                 }
