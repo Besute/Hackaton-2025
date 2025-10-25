@@ -16,4 +16,5 @@ html {
   scrollbar-width: none;
   -ms-overflow-style: none;
   font-size: 62.5%;
+  user-select: none;
 }

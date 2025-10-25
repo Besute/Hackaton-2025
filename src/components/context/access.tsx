@@ -4,9 +4,10 @@ import { createContext, useContext, useEffect, useLayoutEffect, useState } from 
 import { useRouter, usePathname } from 'next/navigation';
 import Loader from "../ui/loader";
 
-const baseURL = ""
+const baseURL = "http://127.0.01:8000"
 
 async function makeFetchGet(url : string, token : string | boolean | null) {
+    console.log(url)
     try {
         const resToGetData = await fetch(url, {
             method: "GET",
@@ -22,25 +23,25 @@ async function makeFetchGet(url : string, token : string | boolean | null) {
 }
 
 interface access {
-    setPassword: (pass: string) => void,
-    setLogin: (log: string) => void,
+    setToken: (token: string) => void;
     token: string | null;
     login: string | undefined;
     setLoading: (load: boolean) => void;
     setOK: (OK: boolean) => void;
     baseURL: string;
     OK: null | boolean;
+    setMemo: (memo: boolean) => void;
 };
 
 export const AccessContext = createContext <access> ({
-    setPassword: () => {},
-    setLogin: () => {},
+    setToken: () => {},
     token: null,
     login: "",
     setLoading: () => {},
     setOK: () => {},
     baseURL: "",
     OK: null,
+    setMemo: () => {},
 });
 
 function AccessProvider({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,7 @@ function AccessProvider({ children }: { children: React.ReactNode }) {
     const [token, setToken] = useState <string | null> (null);
     const [loading, setLoading] = useState(false);
     const [OK, setOK] = useState<boolean | null> (false);
+    const [memo, setMemo] = useState<boolean | null> (false);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -63,16 +65,8 @@ function AccessProvider({ children }: { children: React.ReactNode }) {
         }
     }, [pathname, OK, router])
 
-    useEffect(() => {
-        async function sendData() {
-            const res = await makeFetchGet(baseURL + "login", "")
-            console.log(res)
-        }
-        sendData();
-    }, [login, password])
-
     return (
-        <AccessContext.Provider value={{ setPassword, setLogin, token, login, setLoading, setOK, baseURL, OK }}>
+        <AccessContext.Provider value={{ setToken, token, login, setLoading, setOK, baseURL, OK, setMemo }}>
             {children}
         </AccessContext.Provider>
     );

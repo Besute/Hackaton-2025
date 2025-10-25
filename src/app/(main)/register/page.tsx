@@ -5,9 +5,19 @@ import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AccessContext } from "@/src/components/context/access"
 
-async function makeRegister(url: string) {
+async function makeRegister(url: string, login: string, password: string) {
+    const dataH = JSON.stringify({
+        password,
+        login
+    })
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: dataH,
+        });
         if (!res.ok) {
             return ""
         }
@@ -35,7 +45,7 @@ const Register = function() {
                 const email = document.querySelector(".inputEmail") as HTMLInputElement;
                 const password = document.querySelector(".inputPassword") as HTMLInputElement;
                 if (email !== null && password !== null) {
-                    const res = await makeRegister(baseURL + "/register")
+                    const res = await makeRegister(baseURL + "/register", email.value, password.value)
                     console.log(res)
                     if (res !== "") {
                         setOK(true);
