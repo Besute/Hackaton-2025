@@ -1,4 +1,3 @@
-from codecs import latin_1_decode
 import sqlite3
 from secrets import token_hex
 
@@ -41,22 +40,83 @@ def create_database():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
                 address TEXT NOT NULL,
-                lat REAL,
-                lon REAL
+                client_type TEXT,
+                lt REAL,
+                lg REAL
             )
         ''')
 
         conn.commit()
 
 
+def token_already_exists(token):
+    with sqlite3.connect(DB_Defaults.path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id FROM tokens WHERE token == ?", (token,))
+
+        user_id = cursor.fetchone()
+        conn.commit()
+
+    return user_id is not None
+
+
+def login_already_exists(login):
+    with sqlite3.connect(DB_Defaults.path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id FROM users WHERE login == ?", (login,))
+
+        user_id = cursor.fetchone()
+        conn.commit()
+
+    return user_id is not None
+
+
 def add_user(login, password):
+    if login_already_exists(login):
+        return None
+
     with sqlite3.connect(DB_Defaults.path) as conn:
         cursor = conn.cursor()
 
         token: str = token_hex(16)
+        while token_already_exists(token):
+            token = token_hex(16)
 
         cursor.execute("INSERT INTO users (login, password) VALUES (?, ?)", (login, password))
         cursor.execute("INSERT INTO tokens (token) VALUES (?)", (token, ))
+
+        conn.commit()
+
+    return token
+
+
+def get_user_id_from_login_and_pass(login, password):
+    with sqlite3.connect(DB_Defaults.path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id FROM users WHERE login == ? AND password == ?", (login, password))
+
+        user_id = cursor.fetchone()
+
+        if user_id is None:
+            return None
+
+        return user_id[0]
+
+
+def get_user_token(login, password):
+    user_id = get_user_id_from_login_and_pass(login, password)
+
+    if user_id is None:
+        return None
+
+    with sqlite3.connect(DB_Defaults.path) as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT token FROM tokens WHERE id == ?", (user_id, ))
+        token = cursor.fetchone()[0]
 
         conn.commit()
 
@@ -68,55 +128,54 @@ def get_user_id(token):
         cursor = conn.cursor()
 
         cursor.execute("SELECT id FROM tokens WHERE token == ?", (token,))
-        return cursor.fetchone()[0]
+
+        user_id = cursor.fetchone()
+
+        if user_id is None:
+            return None
+
+        return user_id[0]
 
 
-def add_user_vertex(token, address, lat, lon):
-    user_id = get_user_id(token)
-
+def add_user_vertex(user_id, address, client_type, lt, lg):
     with sqlite3.connect(DB_Defaults.path) as conn:
         cursor = conn.cursor()
 
-        cursor.execute(f"INSERT INTO vertexes (user_id, address, lat, lon) VALUES (?, ?, ?, ?)",
-            (user_id, address, lat, lon)
+        cursor.execute(f"INSERT INTO vertexes (user_id, address, client_type, lt, lg) VALUES (?, ?, ?, ?, ?)",
+            (user_id, address, client_type, lt, lg)
         )
 
         conn.commit()
 
 
-def add_several_user_vertexes(token, vertexes):
-    for vertex in vertexes:
-        add_user_vertex(token, vertex)
-
-
 def get_user_vertexes(token):
     user_id = get_user_id(token)
+
+    if user_id is None:
+        return None
 
     with sqlite3.connect(DB_Defaults.path) as conn:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM vertexes WHERE user_id == ?", (user_id,))
 
-        data = {}
+        vertexes = []
 
         for row in cursor.fetchall():
-            if row[1] not in data.keys():
-                data[row[1]] = []
-
-            data[row[1]].append({
+            vertexes.append({
                 "address": row[2],
+                "client_type": row[3],
+                "lt": row[4],
+                "lg": row[5]
             })
 
-        return data
+        return vertexes
 
 
 if __name__ == "__main__":
     drop_database()
     create_database()
 
-    add_user("test", "test")
+    # token = add_user("test", "test")
 
-    add_user_vertex("test+test", "petersburg")
-    add_user_vertex("test+test", "moscow")
-
-    print(get_user_vertexes("test+test"))
+    print(get_user_token("test", "test"))

@@ -7,3 +7,12 @@ class AuthorizationHeader(BaseModel):
 class UserRegistration(BaseModel):
     login: str
     password: str
+
+class Vertex(BaseModel):
+    address: str
+    client_type: str
+    lt: float
+    lg: float
+
+class ArrayVertex(BaseModel):
+    vertexes: list[Vertex]

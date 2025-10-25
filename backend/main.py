@@ -13,7 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
 from src import db
-from src.models import UserRegistration, AuthorizationHeader
+from src.models import UserRegistration, AuthorizationHeader, ArrayVertex, Vertex
 
 
 app = FastAPI()
@@ -51,22 +51,45 @@ def get_user_id(token: str):
     return {"user_id": user_id}
 
 
+# registration
 @app.post("/register")
-def login_user(user: UserRegistration):
+def register_user(user: UserRegistration):
     token = db.add_user(user.login, user.password)
+    if token is None:
+        return {"error": "User already exists"}
+    return {"token": token}
+
+@app.post("/login")
+def login_user(user: UserRegistration):
+    token = db.get_user_token(user.login, user.password)
+    if token is None:
+        return {"error": "Invalid credentials"}
     return {"token": token}
 
 
+# vertexes
 @app.get("/get_vertexes")
-def get_vertexes(authorization: Annotated[str, Header()] | None = None):
+def get_vertexes(authorization: Annotated[str, Header()]):
     if authorization is None:
         return {"error": "Authorization header is missing. Add 'authorization' to headers"}
 
-    return {"auth": authorization}
+    vertexes = db.get_user_vertexes(authorization)
+    if vertexes is None:
+        return {"success": False, "error": "User not found"}
+    return {"vertexes": vertexes}
+
+@app.post("/add_vertexes")
+def add_vertex(vertex_array: ArrayVertex, authorization: Annotated[str, Header()]):
+    user_id = db.get_user_id(authorization)
+    if user_id is None:
+        return {"success": False, "error": "User not found"}
+
+    for vertex in vertex_array.vertexes:
+        db.add_user_vertex(user_id, vertex.address, vertex.client_type, vertex.lt, vertex.lg)
+    return {"success": True}
 
 
 if __name__ == "__main__":
-    db.drop_database()
-    db.create_database()
-
+    # db.drop_database()
+    # db.create_database()
     uvicorn.run(app, host="127.0.0.1", port=8000)
