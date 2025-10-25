@@ -3,8 +3,8 @@ import React from "react";
 import "./global.css";
 
 export const metadata: Metadata = {
-  title: "TEST TITLE",
-  description: "TEST DESCRIPTION",
+  title: "Бизнес-навигатор",
+  description: "Думайте только о предстоящих встречах!",
   icons: {
     icon: {
         url: "images/icon.ico",

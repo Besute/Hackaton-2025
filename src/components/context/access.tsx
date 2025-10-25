@@ -28,6 +28,8 @@ interface access {
     login: string | undefined;
     setLoading: (load: boolean) => void;
     setOK: (OK: boolean) => void;
+    baseURL: string;
+    OK: null | boolean;
 };
 
 export const AccessContext = createContext <access> ({
@@ -37,6 +39,8 @@ export const AccessContext = createContext <access> ({
     login: "",
     setLoading: () => {},
     setOK: () => {},
+    baseURL: "",
+    OK: null,
 });
 
 function AccessProvider({ children }: { children: React.ReactNode }) {
@@ -62,11 +66,13 @@ function AccessProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         async function sendData() {
             const res = await makeFetchGet(baseURL + "login", "")
+            console.log(res)
         }
+        sendData();
     }, [login, password])
 
     return (
-        <AccessContext.Provider value={{ setPassword, setLogin, token, login, setLoading, setOK }}>
+        <AccessContext.Provider value={{ setPassword, setLogin, token, login, setLoading, setOK, baseURL, OK }}>
             {children}
         </AccessContext.Provider>
     );
