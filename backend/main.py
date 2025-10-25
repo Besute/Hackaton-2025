@@ -82,7 +82,7 @@ def get_vertexes(authorization: Annotated[str, Header()]):
     vertexes = db.get_user_vertexes(authorization)
     if vertexes is None:
         return {"success": False, "error": "User not found"}
-    return {"vertexes": vertexes}
+    return {"vertexes": [input_from_vertex(v) for v in vertexes]}
 
 
 @app.post("/add_vertexes")
@@ -166,7 +166,7 @@ def create_route(
     for i in out[0][1:]:
         route.append(vertexes[i-1])
 
-    return {"route": route, "travel_durations": out[1], "total_time": out[2]}
+    return {"route": [input_from_vertex(v) for v in route], "travel_durations": out[1], "total_time": out[2]}
 
 
 if __name__ == "__main__":

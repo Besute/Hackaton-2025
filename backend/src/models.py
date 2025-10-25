@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from math import ceil
 
 
 class AuthorizationHeader(BaseModel):
@@ -45,7 +46,6 @@ def vertex_from_input(vertex_input: VertexInput) -> Vertex:
         lunch_start = None
         lunch_end = None
 
-
     return Vertex(
         address=vertex_input.address,
         client_type=vertex_input.client_type,
@@ -55,6 +55,17 @@ def vertex_from_input(vertex_input: VertexInput) -> Vertex:
         close_time=close_time,
         lunch_start=lunch_start,
         lunch_end=lunch_end,
+    )
+
+def input_from_vertex(vertex_d: dict) -> VertexInput:
+    vertex = Vertex(**vertex_d)
+    return VertexInput(
+        address=vertex.address,
+        client_type=vertex.client_type,
+        lt=vertex.lt,
+        lg=vertex.lg,
+        working_hours=f"{int(ceil(vertex.open_time))}:{str(ceil((vertex.open_time % 1) * 60)).zfill(2)} - {int(ceil(vertex.close_time))}:{str(ceil((vertex.close_time % 1) * 60)).zfill(2)}",
+        lunch_hours=f"{int(ceil(vertex.lunch_start))}:{str(ceil((vertex.lunch_start % 1) * 60)).zfill(2)} - {int(ceil(vertex.lunch_end))}:{str(ceil((vertex.lunch_end % 1) * 60)).zfill(2)}" if vertex.lunch_start is not None and vertex.lunch_end is not None else None,
     )
 
 class CurrentInfo(BaseModel):
