@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import uvicorn
 
 from typing import Annotated
@@ -8,8 +12,8 @@ from fastapi.security import OAuth2PasswordBearer
 
 from pydantic import BaseModel
 
-from . import db
-from .models import UserRegistration, AuthorizationHeader
+from src import db
+from src.models import UserRegistration, AuthorizationHeader
 
 
 app = FastAPI()

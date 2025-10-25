@@ -3,7 +3,7 @@ import sqlite3
 from secrets import token_hex
 
 class DB_Defaults:
-    path = "backend/db/users.db"
+    path = "db/users.db"
 
 
 def drop_database():
