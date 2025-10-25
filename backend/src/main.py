@@ -1,6 +1,16 @@
 import uvicorn
-from fastapi import FastAPI
+
+from typing import Annotated
+
+from fastapi import FastAPI, Header, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
+
+from pydantic import BaseModel
+
+from . import db
+from .models import UserRegistration, AuthorizationHeader
+
 
 app = FastAPI()
 
@@ -13,19 +23,43 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def home():
+    return "home"
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
-    return {"item_id": item_id, "q": q}
+# database
+@app.get("/create_database")
+def create_database():
+    db.create_database()
+    return {"message": "Database created successfully"}
+
+@app.get("/get_user_id")
+def get_user_id(token: str):
+    user_id = db.get_user_id(token)
+    return {"user_id": user_id}
+
+
+@app.post("/register")
+def login_user(user: UserRegistration):
+    token = db.add_user(user.login, user.password)
+    return {"token": token}
+
+
+@app.get("/get_vertexes")
+def get_vertexes(authorization: Annotated[str, Header()] | None = None):
+    if authorization is None:
+        return {"error": "Authorization header is missing. Add 'authorization' to headers"}
+
+    return {"auth": authorization}
 
 
 if __name__ == "__main__":
+    db.drop_database()
+    db.create_database()
+
     uvicorn.run(app, host="127.0.0.1", port=8000)
