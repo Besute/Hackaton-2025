@@ -175,13 +175,15 @@ def use_algorithm(coordinates, working_times):
 
     result = solve_routes_all_alternatives(travel, working_times, depot=0, diff_threshold=0.10)
 
-    # index = f([r[-1] for r in result])
-    # print([r[-1] for r in result])
-    # print(f([1.0, 2.0, 3.0]))
-
     out = [(r[:len(coordinates)], r[len(coordinates):-1], r[-1]) for r in result]
 
-    return out
+    total_result = [r[-1] for r in result[:5]]
+    while len(total_result) < 5:
+        total_result.append(total_result[-1] + 1)
+
+    index = f(total_result)
+
+    return [out[index]]
 
 
 if __name__=="__main__":

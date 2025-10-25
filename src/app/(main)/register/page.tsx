@@ -37,11 +37,11 @@ const Register = function() {
     const {setOK, OK, baseURL, setToken} = useContext(AccessContext);
     return (
     <div className="w-screen h-screen flex justify-center items-center">
-        <div className="flex flex-col w-[75%] h-[70%]">
+        <div className="flex flex-col w-[75%] md:h-[70%] h-[50%]">
             <h1 className="text-[3rem] text-center">Регистрация</h1>
             <div className="flex flex-col justify-evenly h-[40%] w-[50%] m-auto">
-                <InputComponent placeholder={"Введите вашу почту"} type={"email"} className="bg-gray-400 w-full hover:bg-gray-300 inputEmail" />
-                <InputComponent placeholder={"Введите ваш пароль"} type={"password"} className="w-full bg-gray-400 hover:bg-gray-300 inputEmail inputPassword" />
+                <InputComponent placeholder={"Введите вашу почту"} type={"email"} className="md:text-[2rem] text-[1rem] bg-gray-400 w-full hover:bg-gray-300 inputEmail" />
+                <InputComponent placeholder={"Введите ваш пароль"} type={"password"} className="md:text-[2rem] text-[1rem] w-full bg-gray-400 hover:bg-gray-300 inputEmail inputPassword" />
             </div>
             <Button text="Зарегистрироваться" onSubmit={async () => {
                 const email = document.querySelector(".inputEmail") as HTMLInputElement;
@@ -54,7 +54,7 @@ const Register = function() {
                         setOK(false);
                     }
                 }
-            }} className="m-auto bg-gray-400 h-[4rem] w-[40%] rounded-xl hover:bg-gray-300 text-gray-600"/>
+            }} className="m-auto md:text-[2rem] text-[1rem] bg-gray-400 h-[4rem] w-[40%] rounded-xl hover:bg-gray-300 text-gray-600"/>
             <Button text="Войти" className=" m-auto h-[4rem] w-[40%] rounded-xl text-gray-600 hover:bg-gray-300" onSubmit={() => {
                 router.push("/login")
             }} />
