@@ -4,14 +4,12 @@ import numpy as np
 import openrouteservice as ors
 import time
 
-from src.ai import f
-
 key = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImJiMzM3ZGJiYTI1YTRkOGM5ZjYyNDIyOTIyYzRiYTk4IiwiaCI6Im11cm11cjY0In0='
 client = ors.Client(key=key)
 
 SERVICE_TIME = 5
 
-example_addresses = [
+addresses = [
     "Ростов-на-Дону, улица Варфоломеева, 260А",
     "Ростов-на-Дону, Будённовский проспект, 45",
     "Ростов-на-Дону, улица Малюгиной, 212",
@@ -22,7 +20,7 @@ example_addresses = [
     "Петрозаводская улица, 108, Ростов-на-Дону",
     "Патриотическая улица, 19, Ростов-на-Дону",
 ]
-example_working_times = [
+working_times = [
     [(7 * 60, 22 * 60)],
     [(8 * 60, 13*60), (14*60, 20*60)],
     [(9 * 60, 22 * 60)],
@@ -159,36 +157,22 @@ def create_time_matrix(coords, client, profile='driving-car'):
     return time_matrix
 
 
-def calculate_coordinates(addresses):
+if __name__=="__main__":
+
     coordinates = []
     for address in addresses:
         coords = find_exact_place(client, address)
         if coords:
             coordinates.append(coords)
-    return coordinates
 
-
-def use_algorithm(coordinates, working_times):
     time_matrix_seconds = create_time_matrix(coordinates, client)
     time_matrix_minutes = ((time_matrix_seconds // 40)).astype(int)
     travel = time_matrix_minutes.tolist()
 
-    result = solve_routes_all_alternatives(travel, working_times, depot=0, diff_threshold=0.10)
-
-    # index = f([r[-1] for r in result])
-    # print([r[-1] for r in result])
-    # print(f([1.0, 2.0, 3.0]))
-
-    out = [(r[:len(coordinates)], r[len(coordinates):-1], r[-1]) for r in result]
-
-    return out
-
-
-if __name__=="__main__":
-    out = use_algorithm(calculate_coordinates(example_addresses), example_working_times)
+    out = solve_routes_all_alternatives(travel, working_times, depot=0, diff_threshold=0.10)
 
     if out:
         for i, r in enumerate(out, start=1):
-            print(f"Маршрут {i}: {r[0]}")
+            print(f"Маршрут {i}: {r}")
     else:
         print("Не удалось найти допустимые маршруты.")
