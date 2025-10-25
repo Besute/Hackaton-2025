@@ -6,6 +6,9 @@ import uvicorn
 
 from typing import Annotated
 
+from datetime import datetime
+from pytz import timezone
+
 from fastapi import FastAPI, Header, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
@@ -15,6 +18,7 @@ from pydantic import BaseModel
 from src import db
 from src.models import *
 
+from src.algorithm import use_algorithm, calculate_coordinates
 
 app = FastAPI()
 
@@ -116,6 +120,53 @@ def delete_vertex(address: str, authorization: Annotated[str, Header()]):
 
     db.delete_user_vertex(user_id, address)
     return {"success": True}
+
+
+def calculate_working_time(vertex):
+    if vertex['lunch_start'] is None or vertex['lunch_end'] is None:
+        return [(vertex['open_time'] * 60, vertex['close_time'] * 60)]
+    return [(vertex['open_time'] * 60, vertex['lunch_start'] * 60), (vertex['lunch_end'] * 60, vertex['close_time'] * 60)]
+
+
+@app.post("/create_route")
+def create_route(
+    current_info: CurrentInfo,
+    authorization: Annotated[str, Header()],
+):
+    user_id = db.get_user_id(authorization)
+    if user_id is None:
+        return {"error": "User not found"}
+
+    vertexes = db.get_user_vertexes(authorization)
+
+    addresses = [current_info.current_address] + [v['address'] for v in vertexes]
+    coordinates = [current_info.current_lt, current_info.current_lg] + [[v['lt'], v['lg']] for v in vertexes]
+
+    now = datetime.now(timezone("Europe/Moscow")).time()
+
+    if current_info.current_hour is not None:
+        working_times = [[(current_info.current_hour * 60, 23 * 60 + 59)]] + [calculate_working_time(v) for v in vertexes]
+    else:
+        working_times = [[(now.hour * 60 + now.minute, 23 * 60 + 59)]] + [calculate_working_time(v) for v in vertexes]
+
+    # test
+    import pprint
+    pprint.pp(addresses)
+    pprint.pp(working_times)
+
+
+    out = use_algorithm(calculate_coordinates(addresses), working_times)
+
+    if not out:
+        return {"error": "Невозможно посетить всех клиентов за установленный срок. Пожалуйста, скорректируйте план поездки"}
+
+    out = out[0]
+
+    route = []
+    for i in out[0][1:]:
+        route.append(vertexes[i-1])
+
+    return {"route": route, "travel_durations": out[1], "total_time": out[2]}
 
 
 if __name__ == "__main__":
