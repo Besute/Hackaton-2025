@@ -6,8 +6,26 @@ import AddressInputWithSuggestions from "./inputFieldWithSuggestions";
 interface AdressPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (address: string, lunch: string, work: string) => void;
+  onSubmit: (address: string, lunch: string, work: string, type: string) => void;
 }
+
+// const geocodeAddress = async (address: string): Promise<[number, number]> => {
+//   return new Promise((resolve, reject) => {
+//     window.ymaps.geocode(address, { results: 1 })
+//       .then((result: any) => {
+//         const firstGeoObject = result.geoObjects.get(0);
+//         if (firstGeoObject) {
+//           const coordinates = firstGeoObject.geometry.getCoordinates();
+//           resolve(coordinates);
+//         } else {
+//           reject(new Error(`Адрес не найден: ${address}`));
+//         }
+//       })
+//       .catch((error: any) => {
+//         reject(new Error(`Ошибка геокодирования: ${error}`));
+//       });
+//   });
+// };
 
 const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
         const [formData, setFormData] = useState({
@@ -32,10 +50,9 @@ const AdressPopup = function({isOpen, onClose, onSubmit} : AdressPopupProps) {
         setCoordinates(coords || null);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Данные формы:', formData);
-        onSubmit(formData.address, formData.lunchBreak, formData.workHours);
+        onSubmit(formData.address, formData.lunchBreak, formData.workHours, formData.type);
         onClose();
     };
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

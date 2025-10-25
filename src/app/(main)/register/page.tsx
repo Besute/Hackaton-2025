@@ -18,6 +18,7 @@ async function makeRegister(url: string, login: string, password: string) {
             },
             body: dataH,
         });
+        console.log(res)
         if (!res.ok) {
             return ""
         }

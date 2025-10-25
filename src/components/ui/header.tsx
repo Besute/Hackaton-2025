@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Header = function() {
   return (
-    <header className="bg-gray-500 shadow-lg sticky w-full">
+    <header className="bg-gray-500 shadow-lg sticky w-full flex flex-col items-center justify-center h-[5rem]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -19,12 +19,12 @@ const Header = function() {
             >
               Адреса
             </Link>
-            <Link 
+            {/* <Link 
               href="/map"
               className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 text-white text-[2rem]`}
             >
               Карта
-            </Link>
+            </Link> */}
           </nav>
         </div>
       </div>

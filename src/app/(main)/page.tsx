@@ -6,28 +6,42 @@ import Button from '@/src/components/ui/button';
 import VertexCard from '@/src/components/ui/vertexCard';
 import { Vertex } from '@/src/types/vertex';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useLayoutEffect, useState } from 'react';
 
 const MainPage = function() {
     const router = useRouter();
-    const {setPoints} = useContext(AccessContext)
+    const {setPoints, token, baseURL} = useContext(AccessContext)
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const [vertexes, setVertexes] = useState<Vertex[]>([
-    {
-      address: 'ул. Ленина, 1, Москва',
-      clientType: 'vip',
-      lt: 55.7558,
-      lg: 37.6173
-    },
-    {
-      address: 'ул. Пушкина, 10, Санкт-Петербург',
-      clientType: 'standard',
-      lt: 59.9343,
-      lg: 30.3351
-    }])
-    const addVertex = (vertex: Vertex) => {
-        setVertexes(prev => [...prev, vertex]);
+    const [vertexes, setVertexes] = useState<Vertex[]>([]);
+    useLayoutEffect(() => {
+        async function getCurrentVertexes() {
+            const currentVerts = await fetch(baseURL + "/get_vertexes", {
+                method: "GET",
+                headers: {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `${token}`
+                }
+            })
+        }
+    }, [loading])
+    const addVertex = async (address: string, lunch: string, timeOfWork: string, clientType: string) => {
+        setLoading(true);
+        await fetch(baseURL + "/add_vertex", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `${token}`
+            },
+            body: JSON.stringify({
+                address,
+                client_type: clientType,
+                working_hours: timeOfWork,
+                lunch_hours: lunch,
+            })
+        })
+        setLoading(false);
     };
 
     async function handleDelete() {
@@ -46,7 +60,7 @@ const MainPage = function() {
                 <div className="text-center mb-8">
                     <Button 
                         text="+ Добавить адрес" 
-                        className="font-medium bg-green-500 text-white hover:bg-green-600 rounded-lg shadow-md px-8 py-3 mb-3" 
+                        className="w-[30%] m-auto font-medium bg-green-500 text-white hover:bg-green-600 rounded-lg shadow-md px-8 py-3 mb-3" 
                         onSubmit={() => setIsModalOpen(true)} 
                     />
                 </div>
@@ -57,7 +71,7 @@ const MainPage = function() {
                         vertex={vertex}
                         className='hover:bg-gray-100'
                         />
-                    ))}
+                    ))}     
                 </div>
                 <Button text="Сгенерировать маршрут" className="font-medium m-auto w-[20%] hover:bg-gray-100 bg-white rounded-lg shadow-md border border-gray-200 p-[2rem] mb-3" onSubmit={() => {
                     setPoints(vertexes)
@@ -66,6 +80,9 @@ const MainPage = function() {
                 <AdressPopup 
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
+                    onSubmit={(address: string, lunch: string, work: string, type: string) => {
+                        addVertex(address, lunch, work, type)
+                    }}
             />
             </div>
         </>

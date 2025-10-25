@@ -27,9 +27,15 @@ const VertexCard = function({ vertex, onEdit, onDelete, className = '' }: Vertex
             <span>Широта: {vertex.lt.toFixed(6)}</span>
             <span>Долгота: {vertex.lg.toFixed(6)}</span>
           </div>
+          <div className="flex items-center space-x-4 text-[1.5rem] text-gray-600">
+            <svg className="w-[1.5rem] h-[1.5rem]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+            <span>Время работы: {vertex.timeOfWork}</span>
+          </div>
         </div>
         <span className={`
-              px-[1rem] py-[1rem] text-center p-[2rem] text-[2rem] font-medium rounded-full
+              text-center p-[2rem] text-[2rem] font-medium rounded-full
               ${vertex.clientType === 'vip' 
                 ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                 : 'bg-blue-100 text-blue-800 border border-blue-200'

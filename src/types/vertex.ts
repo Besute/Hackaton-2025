@@ -5,18 +5,21 @@ export interface Vertex {
   clientType: ClientType;
   lt: number;
   lg: number;
+  timeOfWork: string;
 }
 
 export const createVertex = (
   address: string,
   clientType: ClientType,
   lt: number,
-  lg: number
+  lg: number,
+  timeOfWork: string,
 ): Vertex => {
   return {
     address,
     clientType,
     lt,
-    lg
+    lg,
+    timeOfWork
   };
 };
