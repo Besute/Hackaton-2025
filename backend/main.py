@@ -20,11 +20,11 @@ app = FastAPI()
 
 origins = [
     "http://127.0.0.1:3000",
-    "http://127.0.0.1",
+    "http://127.0.0.1"
     "http://localhost",
     "http://localhost:8000",
-    "http://localhost:3000",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -38,7 +38,7 @@ def home():
     return "home"
 
 
-# database
+# databas
 @app.get("/create_database")
 def create_database():
     db.create_database()

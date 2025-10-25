@@ -32,12 +32,11 @@ async function makeRegister(url: string, login: string, password: string) {
 const Register = function() {
     const router = useRouter();
     const {setOK, OK, baseURL, setToken} = useContext(AccessContext);
-    console.log(OK)
     return (
     <div className="w-screen h-screen flex justify-center items-center">
         <div className="flex flex-col w-[75%] h-[70%]">
             <h1 className="text-[3rem] text-center">Регистрация</h1>
-            <div className="flex flex-col justify-evenly h-[30%] w-[50%] m-auto">
+            <div className="flex flex-col justify-evenly h-[40%] w-[50%] m-auto">
                 <InputComponent placeholder={"Введите вашу почту"} type={"email"} className="bg-gray-400 w-full hover:bg-gray-300 inputEmail" />
                 <InputComponent placeholder={"Введите ваш пароль"} type={"password"} className="w-full bg-gray-400 hover:bg-gray-300 inputEmail inputPassword" />
             </div>
@@ -46,19 +45,19 @@ const Register = function() {
                 const password = document.querySelector(".inputPassword") as HTMLInputElement;
                 if (email !== null && password !== null) {
                     const res = await makeRegister(baseURL + "/register", email.value, password.value)
-                    console.log(res)
                     if (res !== "") {
                         setOK(true);
                         setToken(res);
+                        router.push("/")
                     } else {
                         setOK(false);
                     }
                 }
             }} className="m-auto bg-gray-400 h-[4rem] w-[40%] rounded-xl hover:bg-gray-300 text-gray-600"/>
-            <Button text="Войти" className="m-auto h-[4rem] w-[40%] rounded-xl text-gray-600 hover:bg-gray-300" onSubmit={() => {
+            <Button text="Войти" className=" m-auto h-[4rem] w-[40%] rounded-xl text-gray-600 hover:bg-gray-300" onSubmit={() => {
                 router.push("/login")
             }} />
-            {OK === false ? (<div className="text-[3rem] m-auto text-gray-600">Такой email уже занят!</div>) : null}
+            {(OK === false && OK !== null) ? (<div className="text-[3rem] m-auto text-gray-600">Такой email уже занят!</div>) : null}
         </div>
     </div>
     )
